@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>에임의 정석</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <header>
+      <nav class="bg-white shadow">
+        <div class="container mx-auto flex items-center justify-between p-4">
+          <a class="text-2xl font-bold text-red-600" href="index.html">
+            에임의 정석
+          </a>
+          <button
+            class="block lg:hidden text-gray-600 focus:outline-none"
+            id="menu-toggle"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+          <div
+            class="hidden lg:flex flex-col lg:flex-row lg:space-x-4"
+            id="navbarSupportedContent"
+          >
+            <a class="text-gray-600 hover:text-gray-800" href="aimtest.html"
+              >Aim Test</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="reaction.html"
+              >Reaction time</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="">Tracking</a>
+          </div>
+        </div>
+        <!-- 모바일 드롭다운 메뉴 -->
+        <div class="hidden lg:hidden" id="mobile-menu">
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="aimtest.html"
+            >Aim Test</a
+          >
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="reaction.html"
+            >Reaction time</a
+          >
+          <a class="block px-4 py-2 text-gray-600 hover:bg-gray-100" href=""
+            >Tracking</a
+          >
+        </div>
+      </nav>
+    </header>
+    <!-- 헤더끝 -->
+
+    <main class="container mx-auto p-4">
+      <!-- 동영상 재생 부분 -->
+      <div class="mb-8">
+        <video
+          class="w-full rounded-lg shadow-lg"
+          controls
+          poster="video-thumbnail.jpg"
+        >
+          <source src="video.mp4" type="video/mp4" />
+          <!-- 브라우저가 동영상을 지원하지 않습니다. -->
+        </video>
+      </div>
+
+      <!-- 카드 그리드 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Aim Test 카드 -->
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition"
+        >
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Aim Test</h3>
+          <p class="text-gray-600 mb-4">
+            에임 테스트를 통해 당신의 정확도를 확인하세요.
+          </p>
+          <a
+            href="aimtest.html"
+            class="inline-block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            자세히 보기
+          </a>
+        </div>
+
+        <!-- Reaction Time 카드 -->
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition"
+        >
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Reaction Time</h3>
+          <p class="text-gray-600 mb-4">
+            반응 속도를 측정하고 개선할 수 있는 도구입니다.
+          </p>
+          <a
+            href="reaction.html"
+            class="inline-block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            자세히 보기
+          </a>
+        </div>
+
+        <!-- Tracking 카드 -->
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition"
+        >
+          <h3 class="text-xl font-bold text-gray-800 mb-4">Tracking</h3>
+          <p class="text-gray-600 mb-4">트래킹 능력을 테스트하고 훈련하세요.</p>
+          <a
+            href=""
+            class="inline-block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            오픈예정
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <div class="container mx-auto">
+      <footer class="flex flex-wrap justify-between items-center py-4">
+        <div class="text-gray-500">&copy; AimEssentials</div>
+      </footer>
+    </div>
+  </body>
+
+  <script>
+    // JavaScript로 메뉴 토글 기능 추가
+    const menuToggle = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    menuToggle.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  </script>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>에임의 정석</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      .clicked {
+        background-color: red; /* 클릭 시 초록색으로 변경 */
+        transform: scale(1.2); /* 클릭 시 크기 확대 */
+        transition: transform 0.2s ease, background-color 0.2s ease; /* 부드러운 애니메이션 */
+      }
+      #game-area {
+        cursor: url("cross-shaped-target.png") 16 16, crosshair; /* 사용자 정의 커서 */
+      }
+
+      /* #game-area:hover {
+        cursor: crosshair; /* 마우스가 영역 위에 있을 때 포인터로 변경 
+      } */
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+    <header>
+      <nav class="bg-white shadow">
+        <div class="container mx-auto flex items-center justify-between p-4">
+          <a class="text-2xl font-bold text-red-600" href="index.html">
+            에임의 정석
+          </a>
+          <button
+            class="block lg:hidden text-gray-600 focus:outline-none"
+            id="menu-toggle"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+          <div
+            class="hidden lg:flex flex-col lg:flex-row lg:space-x-4"
+            id="navbarSupportedContent"
+          >
+            <a class="text-gray-600 hover:text-gray-800" href="aimtest.html"
+              >Aim Test</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="reaction.html"
+              >Reaction time</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="">Tracking</a>
+          </div>
+        </div>
+        <!-- 모바일 드롭다운 메뉴 -->
+        <div class="hidden lg:hidden" id="mobile-menu">
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="aimtest.html"
+            >Aim Test</a
+          >
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="reaction.html"
+            >Reaction time</a
+          >
+          <a class="block px-4 py-2 text-gray-600 hover:bg-gray-100" href=""
+            >Tracking</a
+          >
+        </div>
+      </nav>
+    </header>
+    <!-- 헤더끝 -->
+
+    <main class="container mx-auto p-4 flex-grow">
+      <h1 class="text-3xl font-bold text-center mb-4">반응속도 에임 테스트</h1>
+      <p class="text-center text-gray-600 mb-6">
+        나타나는 타겟을 최대한 빠르게 클릭하세요. 총 10개의 타겟을 클릭하면
+        테스트가 종료됩니다.
+      </p>
+
+      <div class="flex justify-around bg-white p-4 rounded-lg shadow mb-6">
+        <div class="text-center">
+          <div class="text-sm text-gray-500">남은 타겟</div>
+          <div class="text-2xl font-bold text-gray-800" id="targets-left">
+            10
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-sm text-gray-500">마지막 클릭</div>
+          <div class="text-2xl font-bold text-gray-800" id="last-time">0ms</div>
+        </div>
+        <div class="text-center">
+          <div class="text-sm text-gray-500">평균 시간</div>
+          <div class="text-2xl font-bold text-gray-800" id="avg-time">0ms</div>
+        </div>
+      </div>
+
+      <div
+        class="relative w-full h-[calc(100vh-400px)] bg-white rounded-lg shadow overflow-hidden mb-6 flex items-center justify-center"
+        id="game-area"
+      >
+        <button
+          class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+          id="start-btn"
+        >
+          시작하기
+        </button>
+
+        <!-- 타겟은 JS로 여기에 추가됩니다 -->
+      </div>
+
+      <div
+        class="hidden bg-white p-6 rounded-lg shadow text-center"
+        id="results"
+      >
+        <h2 class="text-2xl font-bold mb-4">결과</h2>
+        <p class="text-gray-600 mb-4">
+          평균 반응 시간: <span id="final-time">0ms</span>
+        </p>
+        <button
+          class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+          id="restart-btn"
+        >
+          다시 시작
+        </button>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <footer class="bg-white py-4 shadow mt-6">
+      <div class="container mx-auto text-center text-gray-500">
+        &copy; AimEssentials
+      </div>
+    </footer>
+
+    <script>
+      // 전역 변수
+      const totalTargets = 10;
+      let targetsLeft = totalTargets;
+      let currentTarget = null;
+      let startTime = 0;
+      let timesArray = [];
+      let isGameRunning = false;
+
+      // DOM 요소
+      const gameArea = document.getElementById("game-area");
+      const startBtn = document.getElementById("start-btn");
+      const targetsLeftEl = document.getElementById("targets-left");
+      const lastTimeEl = document.getElementById("last-time");
+      const avgTimeEl = document.getElementById("avg-time");
+
+      // 모바일 기기 감지
+      const isMobile =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        navigator.msMaxTouchPoints > 0;
+
+      // 게임 시작
+      function startGame() {
+        // 게임 상태 초기화
+        targetsLeft = totalTargets;
+        timesArray = [];
+        isGameRunning = true;
+
+        // UI 업데이트
+        targetsLeftEl.textContent = targetsLeft;
+        lastTimeEl.textContent = "0ms";
+        avgTimeEl.textContent = "0ms";
+        startBtn.style.display = "none";
+        gameArea.innerHTML = ""; // 게임 영역 초기화
+
+        // 첫 타겟 생성
+        createTarget(); // 타겟 생성 호출
+      }
+
+      // 타겟 생성
+      function createTarget() {
+        if (targetsLeft <= 0) {
+          endGame();
+          return;
+        }
+
+        // 이전 타겟 제거
+        if (currentTarget && gameArea.contains(currentTarget)) {
+          gameArea.removeChild(currentTarget);
+        }
+
+        // 타겟 요소 생성
+        const target = document.createElement("div");
+        target.className =
+          "absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold transition-transform transform hover:scale-105";
+
+        // 타겟 크기 설정 (모바일에서는 더 크게)
+        const targetSize = isMobile ? 60 : 50;
+        target.style.width = `${targetSize}px`;
+        target.style.height = `${targetSize}px`;
+
+        // 게임 영역 크기 가져오기
+        const gameWidth = gameArea.clientWidth;
+        const gameHeight = gameArea.clientHeight;
+
+        // 랜덤 위치 계산
+        const maxX = gameWidth - targetSize;
+        const maxY = gameHeight - targetSize;
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(Math.random() * maxY);
+
+        // 타겟 위치 설정
+        target.style.left = `${randomX}px`;
+        target.style.top = `${randomY}px`;
+
+        // 타겟에 남은 수 표시
+        target.textContent = targetsLeft;
+
+        // 이벤트 리스너 추가
+        if (isMobile) {
+          target.addEventListener("touchend", handleTargetHit);
+        } else {
+          target.addEventListener("click", handleTargetHit);
+        }
+
+        // 게임 영역에 타겟 추가
+        gameArea.appendChild(target);
+        currentTarget = target;
+
+        // 시작 시간 기록
+        startTime = performance.now();
+      }
+
+      // 타겟 클릭/터치 처리
+      function handleTargetHit(e) {
+        if (!isGameRunning) return;
+
+        // 이벤트 기본 동작 방지 (중요: 모바일에서 이중 트리거 방지)
+        e.preventDefault();
+
+        // 반응 시간 계산
+        const endTime = performance.now();
+        const reactionTime = endTime - startTime;
+        timesArray.push(reactionTime);
+
+        // 타겟 수 감소
+        targetsLeft--;
+
+        // UI 업데이트
+        lastTimeEl.textContent = `${Math.round(reactionTime)}ms`;
+        targetsLeftEl.textContent = targetsLeft;
+
+        // 평균 반응 시간 계산
+        const avgTime =
+          timesArray.reduce((a, b) => a + b, 0) / timesArray.length;
+        avgTimeEl.textContent = `${Math.round(avgTime)}ms`;
+
+        // 클릭 효과 (시각적 피드백)
+        currentTarget.classList.add("clicked");
+
+        // 약간의 지연 후 다음 타겟 생성
+        setTimeout(() => {
+          createTarget();
+        }, 100);
+      }
+
+      // 게임 종료
+      function endGame() {
+        isGameRunning = false;
+
+        // 평균 시간 계산
+        const avgTime =
+          timesArray.reduce((a, b) => a + b, 0) / timesArray.length;
+
+        // 최고 기록 저장 및 가져오기
+        const bestAimTime = localStorage.getItem("bestAimTime");
+        if (!bestAimTime || avgTime < bestAimTime) {
+          localStorage.setItem("bestAimTime", avgTime);
+        }
+
+        const bestTimeDisplay = localStorage.getItem("bestAimTime");
+
+        // 게임 영역에 결과 표시
+        gameArea.innerHTML = `
+          <div class="results-overlay flex flex-col items-center justify-center h-full">
+            <h2 class="text-2xl font-bold mb-4">결과</h2>
+            <p class="text-gray-600 mb-4">
+              평균 반응 시간: <span>${Math.round(avgTime)}ms</span>
+            </p>
+            <p class="text-gray-600 mb-4">
+              최고 기록: <span>${Math.round(bestTimeDisplay)}ms</span>
+            </p>
+            <div class="flex gap-4">
+              <button
+                class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+                id="restart-btn"
+              >
+                다시 시작
+              </button>
+              <button
+                class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition"
+                id="reset-record-btn"
+              >
+                기록 초기화
+              </button>
+            </div>
+          </div>
+        `;
+
+        // "다시 시작" 버튼 이벤트 리스너 추가
+        const restartBtn = document.getElementById("restart-btn");
+        restartBtn.addEventListener("click", startGame);
+
+        // "기록 초기화" 버튼 이벤트 리스너 추가
+        const resetRecordBtn = document.getElementById("reset-record-btn");
+        resetRecordBtn.addEventListener("click", () => {
+          localStorage.removeItem("bestAimTime");
+          alert("기록이 초기화되었습니다!");
+        });
+      }
+
+      // 이벤트 리스너 등록
+      startBtn.addEventListener("click", startGame);
+
+      // 터치 이벤트 지연 제거 (모바일)
+      if (isMobile) {
+        gameArea.addEventListener(
+          "touchstart",
+          (e) => {
+            if (isGameRunning) e.preventDefault();
+          },
+          { passive: false }
+        );
+      }
+    </script>
+  </body>
+</html>

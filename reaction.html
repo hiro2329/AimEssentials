@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>에임의 정석</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-gray-100 text-gray-800 flex flex-col min-h-screen">
+    <header>
+      <nav class="bg-white shadow">
+        <div class="container mx-auto flex items-center justify-between p-4">
+          <a class="text-2xl font-bold text-red-600" href="index.html">
+            에임의 정석
+          </a>
+          <button
+            class="block lg:hidden text-gray-600 focus:outline-none"
+            id="menu-toggle"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+          <div
+            class="hidden lg:flex flex-col lg:flex-row lg:space-x-4"
+            id="navbarSupportedContent"
+          >
+            <a class="text-gray-600 hover:text-gray-800" href="aimtest.html"
+              >Aim Test</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="reaction.html"
+              >Reaction time</a
+            >
+            <a class="text-gray-600 hover:text-gray-800" href="">Tracking</a>
+          </div>
+        </div>
+        <!-- 모바일 드롭다운 메뉴 -->
+        <div class="hidden lg:hidden" id="mobile-menu">
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="aimtest.html"
+            >Aim Test</a
+          >
+          <a
+            class="block px-4 py-2 text-gray-600 hover:bg-gray-100"
+            href="reaction.html"
+            >Reaction time</a
+          >
+          <a class="block px-4 py-2 text-gray-600 hover:bg-gray-100" href=""
+            >Tracking</a
+          >
+        </div>
+      </nav>
+    </header>
+    <!-- 헤더끝 -->
+
+    <!-- 메인 콘텐츠 -->
+    <main class="container mx-auto p-4 flex-grow">
+      <h1 class="text-3xl font-bold text-center mb-4">반응속도 테스트</h1>
+      <p class="text-center text-gray-600 mb-6">
+        화면이 초록색으로 바뀌면 클릭하세요. 반응 속도를 측정합니다.
+      </p>
+
+      <div
+        class="relative w-full h-[calc(100vh-200px)] bg-gray-300 rounded-lg shadow overflow-hidden mb-6 flex items-center justify-center"
+        id="game-area"
+      >
+        <p class="text-gray-600 text-lg">클릭하여 시작하세요</p>
+      </div>
+    </main>
+
+    <!-- footer -->
+    <footer class="bg-white py-4 shadow mt-6">
+      <div class="container mx-auto text-center text-gray-500">
+        &copy; AimEssentials
+      </div>
+    </footer>
+
+    <script>
+      // JavaScript로 메뉴 토글 기능 추가
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      const gameArea = document.getElementById("game-area");
+
+      let startTime = 0;
+      let timeout;
+      let isGameRunning = false;
+
+      // 게임 시작
+      gameArea.addEventListener("click", () => {
+        if (isGameRunning) {
+          // 게임이 이미 진행 중일 때 빨간색에서 클릭하면 경고
+          if (gameArea.style.backgroundColor === "red") {
+            gameArea.innerText = "너무 빨리 클릭했습니다! 다시 시도하세요.";
+            resetGame();
+          } else if (gameArea.style.backgroundColor === "green") {
+            // 초록색에서 클릭하면 반응 시간 측정
+            const reactionTime = performance.now() - startTime;
+            showResults(reactionTime);
+          }
+          return;
+        }
+
+        // 게임 초기화 및 시작
+        isGameRunning = true;
+        gameArea.style.backgroundColor = "red";
+        gameArea.innerText = "기다리세요...";
+
+        // 랜덤 시간 후 초록색으로 변경
+        timeout = setTimeout(() => {
+          gameArea.style.backgroundColor = "green";
+          gameArea.innerText = "지금 클릭하세요!";
+          startTime = performance.now();
+        }, Math.random() * 2000 + 1000); // 1초~3초 랜덤
+      });
+
+      // 결과 표시
+      function showResults(reactionTime) {
+        isGameRunning = false;
+        gameArea.style.backgroundColor = "gray";
+        gameArea.innerHTML = `
+          <div class="text-center">
+            <p class="text-xl font-bold block mt-4">반응 시간: ${Math.round(
+              reactionTime
+            )}ms</p>
+            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            onclick="resetGame()">
+               다시 시작
+            </button>
+          </div>
+        `;
+      }
+
+      // // 게임 리셋
+      // function resetGame() {
+      //   clearTimeout(timeout);
+      //   isGameRunning = false;
+      //   gameArea.style.backgroundColor = "gray";
+      //   gameArea.innerText = "클릭하여 시작하세요";
+      // }
+
+      function resetGame() {
+        clearTimeout(timeout);
+        isGameRunning = false;
+        gameArea.style.backgroundColor = "gray";
+        gameArea.innerText = "클릭하여 시작하세요";
+
+        // 최고 기록 초기화 버튼 추가
+        const resetBestTimeBtn = document.createElement("button");
+        resetBestTimeBtn.textContent = "최고 기록 초기화";
+        resetBestTimeBtn.className =
+          "mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition";
+        resetBestTimeBtn.onclick = () => {
+          localStorage.removeItem("bestTime");
+          alert("최고 기록이 초기화되었습니다!");
+        };
+        gameArea.appendChild(resetBestTimeBtn);
+      }
+      // 결과 표시
+      function showResults(reactionTime) {
+        isGameRunning = false;
+        gameArea.style.backgroundColor = "gray";
+
+        // 최고 기록 저장 및 가져오기
+        const bestTime = localStorage.getItem("bestTime"); //localStorage.getItem()은 키가 존재하지 않을 때 null 을 반환
+        if (!bestTime || reactionTime < bestTime) {
+          localStorage.setItem("bestTime", reactionTime);
+        }
+
+        const bestTimeDisplay = localStorage.getItem("bestTime");
+
+        // 게임 영역에 결과 표시
+        gameArea.innerHTML = `
+    <div class="text-center">
+      <p class="text-xl font-bold block mt-4">반응 시간: ${Math.round(
+        reactionTime
+      )}ms</p>
+      <p class="text-lg text-gray-600 mt-2">최고 기록: ${Math.round(
+        bestTimeDisplay
+      )}ms</p>
+      <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+        onclick="resetGame()">
+        다시 시작 
+      </button>
+    </div>
+  `;
+      }
+    </script>
+  </body>
+</html>

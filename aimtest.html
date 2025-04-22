@@ -154,6 +154,15 @@
     </footer>
 
     <script>
+       // JavaScript로 메뉴 토글 기능 추가
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      
       // 전역 변수
       const totalTargets = 10;
       let targetsLeft = totalTargets;

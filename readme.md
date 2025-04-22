@@ -15,11 +15,18 @@
 
 ### 1. Aim Test
 
+![AimTest Demo](./aimtest.gif)  
+_Aim Test 실행 화면_
+
+
 - 화면에 나타나는 타겟을 빠르고 정확하게 클릭하여 에임 정확도를 측정합니다.
 - 타겟 생성 및 반응 속도 기록.
 - 최고 기록 저장 및 표시 기능.
 
 ### 2. Reaction Time Test
+
+![Reaction Time Demo](./reaction.gif)  
+_Reaction Time Test 실행 화면_
 
 - 화면이 초록색으로 바뀌는 순간을 클릭하여 반응 속도를 측정합니다.
 - 최고 기록 저장 및 표시 기능.
